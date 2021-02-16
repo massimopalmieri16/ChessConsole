@@ -15,19 +15,19 @@ void Game::newGame()
 	int menuInput = -1;
 	std::string moveInput = "";
 
-	while (menuInput != 0)
+	while (menuInput != 1)
 	{
 		if (upperTurn) std::cout << "\n Upper Turn";
 		if (lowerTurn) std::cout << "\n Lower Turn";
 		
-		std::cout << "\n1 - Move\n2 - Print Board\n0 - Quit Game\n\n";
+		std::cout << "\n3 - Move\n2 - Print Board\n1 - Quit Game\n\n";
 		std::cout << "Waiting for input... ";
 		std::cin.clear(); 
 		std::cin >> menuInput;
 
 		switch (menuInput)
 		{
-		case 1:
+		case 3:
 			std::cout << "\nWrite move (eg a2 a4)\n";
 			std::cin.ignore();
 			getline(std::cin, moveInput);
@@ -71,7 +71,8 @@ void Game::newGame()
 		case 2:
 			board.printBoard();
 			break;
-		case 0:
+		case 1:
+			std::cout << "Exit\n";
 			break;
 		default:
 			std::cout << "Invalid command\n";
@@ -88,22 +89,63 @@ bool Game::move(int rowStart, int colStart, int rowEnd, int colEnd)
 	// Check if moving the right elem according to the turn
 	if ((isupper(elemStart) && upperTurn) || (!isupper(elemStart) && lowerTurn)) {
 
-		board.boardMatrix[rowEnd][colEnd] = board.boardMatrix[rowStart][colStart];
-		board.boardMatrix[rowStart][colStart] = 0x20;
+		// check if valid move
+		if (isValid(rowStart, colStart, rowEnd, colEnd)) {
 
-		if (upperTurn) {
-			upperTurn = false;
-			lowerTurn = true;
+			board.boardMatrix[rowEnd][colEnd] = board.boardMatrix[rowStart][colStart];
+			board.boardMatrix[rowStart][colStart] = 0x20;
+
+			if (upperTurn) {
+				upperTurn = false;
+				lowerTurn = true;
+			}
+			else {
+				lowerTurn = false;
+				upperTurn = true;
+			}
+
+			return true;
 		}
 		else {
-			lowerTurn = false;
-			upperTurn = true;
+			return false;
 		}
-
-		return true;
 	}
 	else
 	{
 		return false;
 	}
+}
+
+bool Game::isValid(int rowStart, int colStart, int rowEnd, int colEnd)
+{
+	char elemStart = board.boardMatrix[rowStart][colStart];
+	bool endIsEmpty = board.boardMatrix[rowEnd][colEnd] == 0x20;
+
+	if (elemStart == 'p') {	// lower pawn
+		if (colStart == colEnd && rowStart == rowEnd + 1 && endIsEmpty) return true;	// simple step forward if empty
+		if (colStart == colEnd && rowStart == rowEnd + 2 && endIsEmpty && rowStart == 6) return true;
+		if ((colStart == colEnd + 1 || colStart == colEnd - 1) && rowStart == rowEnd + 1 && !endIsEmpty)	return true;	// side capturing
+	}
+	if (elemStart == 'P') {	// upper pawn
+		if (colStart == colEnd && rowStart == rowEnd - 1 && endIsEmpty) return true;	// simple step forward if empty
+		if (colStart == colEnd && rowStart == rowEnd - 2 && endIsEmpty && rowStart == 1) return true;
+		if ((colStart == colEnd + 1 || colStart == colEnd - 1) && rowStart == rowEnd - 1 && !endIsEmpty)	return true;	// side capturing
+	}
+	if (::tolower(elemStart) == 'r') {	// rook
+
+	}
+	if (::tolower(elemStart) == 'n') {	// knight
+
+	}
+	if (::tolower(elemStart) == 'b') {	// bishop
+
+	}
+	if (::tolower(elemStart) == 'q') {	// queen
+
+	}
+	if (::tolower(elemStart) == 'k') {	// king
+
+	}
+
+	return false;
 }

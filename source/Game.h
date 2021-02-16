@@ -11,5 +11,6 @@ public:
 	Game();
 	void newGame();
 	bool move(int rowStart, int colStart, int rowEnd, int colEnd);
+	bool isValid(int rowStart, int colStart, int rowEnd, int colEnd);
 };
 
